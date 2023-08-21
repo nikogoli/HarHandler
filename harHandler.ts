@@ -301,11 +301,11 @@ class Logs {
 
   log (arg:string) {
     console.log(arg)
-    this.logs.push("\t"+arg)
+    this.logs.push("\t"+arg.replaceAll(/\x1b\[\d\dm/g, ""))
   }
 
   onlylog (arg:string) {
-    this.logs.push(arg)
+    this.logs.push(arg.replaceAll(/\x1b\[\d\dm/g, ""))
   }
 
   handleError(
