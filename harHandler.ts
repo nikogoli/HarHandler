@@ -46,7 +46,7 @@ export class HarHandler {
 
     await HAR_Data.log.entries.reduce(
       (pre, entry, idx) => pre.then( async () => {
-        this.loggs.onlylog(`[Start] entry ${idx} (entry-time-stamp: ${entry.startedDateTime})`)
+        this.loggs.onlylog("start", `entry ${idx} (entry-time-stamp: ${entry.startedDateTime})`)
 
         const { url } = entry.request
         const { mimeType, text, encoding } = entry.response.content
@@ -71,17 +71,14 @@ export class HarHandler {
           }
           else {
             if (entry.response.content.comment && entry.response.content.comment == "応答ボディは省略しました。"){
-              this.loggs.onlylog(`\t ブラウザによって省略：${url}`)
-              console.log(`[${red("ブラウザによって省略")}]: ${url}`)
+              this.loggs.log("", `\t ${red("ブラウザによって省略")}：${url}`)
             }
-            this.loggs.onlylog(`\t skip: handling for '${mimeType}' is not defined.`)
-            console.log(`[${yellow("skip")}]: handling for '${mimeType}' is not defined.`)
+            this.loggs.log(yellow("skip"), `handling for '${mimeType}' is not defined.`)
           }
-          this.loggs.onlylog(`[End]\n`)
+          this.loggs.onlylog("End", `\n`)
         } else {
-          this.loggs.onlylog(`\t(mimeType: ${mimeType}): response.content.text NOT exist.`)
-          this.loggs.onlylog(`[Skip]\n`)
-          console.log(`[${yellow("skip")}]: (mimeType: ${yellow(mimeType)}): response.content.text NOT exist.`)
+          this.loggs.log(yellow("skip"), `(mimeType: ${mimeType}): response.content.text NOT exist.`)
+          this.loggs.onlylog("Skip", `\n`)
         }
       })
     , Promise.resolve())
@@ -121,10 +118,10 @@ export class HarHandler {
       if (encoding == "base64"){
         try {
           await file_p.write_bytes(base64Decode(text))
-          this.loggs.onlylog(`\t${mimeType}`)
-          this.loggs.log(`[${blue("creat")}]: ${file_p.name}`)
+          this.loggs.onlylog("", `\t${mimeType}`)
+          this.loggs.log(blue("creat"), `${file_p.name}`)
         } catch (error) {
-          this.loggs.log(`[${red("ERROE (img)")}]: ${file_p.name}\n${error}\n`)
+          this.loggs.log(red("ERROE (img)"), `${file_p.name}\n${error}\n`)
         }
       } else {
         this.loggs.handleError(
@@ -153,14 +150,14 @@ export class HarHandler {
     try {
       const j_data = JSON.parse(text)
       await file_p.write_JSON(j_data, {space:2})
-      this.loggs.onlylog(`\tjson`)
-      this.loggs.log(`[${blue("create")}]: ${file_p.name}`) 
+      this.loggs.onlylog("", `\tjson`)
+      this.loggs.log(blue("create"), `${file_p.name}`)
     } catch (error) {
       if (error instanceof SyntaxError){
         const new_p = file_p.with_suffix(".json.unknown_codec")
         await new_p.write_text(text)
-        this.loggs.onlylog(`\tjson (SyntaxError)`)
-        this.loggs.log(`[${blue("create")}]: ${new_p.name}`) 
+        this.loggs.onlylog("", `\tjson (SyntaxError)`)
+        this.loggs.log(blue("create"), `${new_p.name}`) 
       } else {
         throw error
       }
@@ -178,8 +175,8 @@ export class HarHandler {
       ? new PathLike(this.#misc_dir, `${idx}.txt`)
       : new PathLike(this.#misc_dir, name)
     await file_p.write_text(this.#textReplacer(text))
-    this.loggs.onlylog(`\ttext/plain`)
-    this.loggs.log(`[${blue("create")}]: ${file_p.name}`)
+    this.loggs.onlylog("", `\ttext/plain`)
+    this.loggs.log(blue("create"), file_p.name)
   }
 
 
@@ -193,8 +190,8 @@ export class HarHandler {
       ? new PathLike(this.#sound_dir, `${idx}.mp3`)
       : new PathLike(this.#sound_dir, name)
     await file_p.write_bytes(base64Decode(text))
-    this.loggs.onlylog(`\tmp3`)
-    this.loggs.log(`[${blue("create")}]: ${file_p.name}`)
+    this.loggs.onlylog("", `\tmp3`)
+    this.loggs.log(blue("create"), file_p.name)
   }
 
   
@@ -211,14 +208,14 @@ export class HarHandler {
       const file_p = new PathLike(this.#misc_dir, name)
       const data = textDecoder.decode(base64Decode(text))
       await file_p.write_text(data)
-      this.loggs.onlylog(`\tplist`)
-      this.loggs.log(`[${blue("create")}]: ${file_p.name}`)
+      this.loggs.onlylog("", `\tplist`)
+      this.loggs.log(blue("create"), file_p.name)
     }
     else if (name.endsWith(".unity3d")){
       const file_p = new PathLike(this.#unity_dir, name)
       await file_p.write_bytes(base64Decode(text))
-      this.loggs.onlylog(`\tunity3d`)
-      this.loggs.log(`[${blue("create")}]: ${file_p.name}`)
+      this.loggs.onlylog("", `\tunity3d`)
+      this.loggs.log(blue("create"), file_p.name)
     }
     else {
       const name = `${idx}_byteFile`
@@ -227,8 +224,8 @@ export class HarHandler {
         const cab = texted.match(/CAB-[a-z\d]{32}/)
         const file_p = new PathLike(this.#unity_dir, (cab ? cab[0] : name)+ ".unity3d") 
         await file_p.write_bytes(base64Decode(text))
-        this.loggs.onlylog(`\tunity3d`)
-        this.loggs.log(`[${blue("create")}]: ${file_p.name}`)
+        this.loggs.onlylog("", `\tunity3d`)
+        this.loggs.log(blue("create"), file_p.name)
       }
       else if (texted.startsWith("@UTF")){
         const file_p = new PathLike(this.#acbawb_dir, name + ".acb")
@@ -243,14 +240,14 @@ export class HarHandler {
       else if (texted.startsWith("AFS2")){
         const file_p = new PathLike(this.#acbawb_dir, name + ".acb")
         await file_p.write_bytes(base64Decode(text))
-        this.loggs.onlylog(`\tawb`)
-        this.loggs.log(`[${blue("create")}]: ${file_p.name}`)
+        this.loggs.onlylog("", `\tawb`)
+        this.loggs.log(blue("create"), file_p.name)
       }
       else {
         const file_p = new PathLike(this.#unknown_dir, name + "_unknown")
         await file_p.write_bytes(base64Decode(text))
-        this.loggs.onlylog(`\tbytes (unknown)`)
-        this.loggs.log(`[${blue("create")}]: ${file_p.name}`)
+        this.loggs.onlylog("", `\tbytes (unknown)`)
+        this.loggs.log(blue("create"), file_p.name)
       }
     }
   }
@@ -270,20 +267,20 @@ export class HarHandler {
     const status = await command.output()
   
     const msg = new TextDecoder().decode(status.stdout)
-    this.loggs.onlylog(`\n\t${msg.split("\n").join("\n\t")}`)
+    this.loggs.onlylog("", `\n\t${msg.split("\n").join("\n\t")}`)
     if (status.success) {
       const act_name = msg.match(/stream name: ([^ \r\n]+)\s/)
       if (act_name){
-        this.loggs.onlylog(`\twab`)
-        this.loggs.log(`[${blue("create")}]: ${act_name[1]}.wav`)
+        this.loggs.onlylog("", `\twab`)
+        this.loggs.log(blue("create"), `${act_name[1]}.wav`)
       } else {
-        this.loggs.onlylog(`\twab`)
-        this.loggs.log(`[${blue("create")}]: ${file_p.stem}.wav`)
+        this.loggs.onlylog("", `\twab`)
+        this.loggs.log(blue("create"), `${file_p.stem}.wav`)
       }
       await Deno.remove(file_path)
     } else {
-      this.loggs.onlylog(`\t acb/awb (vgmstresm faild)`)
-      this.loggs.log(`[${blue("create")}]: ${file_p.name}`)
+      this.loggs.onlylog("", `\t acb/awb (vgmstresm faild)`)
+      this.loggs.log(blue("create"), file_p.name)
     }
   }
 
@@ -299,13 +296,15 @@ class Logs {
     this.failed = []
   }
 
-  log (arg:string) {
-    console.log(arg)
-    this.logs.push("\t"+arg.replaceAll(/\x1b\[\d\dm/g, ""))
+  log (title:string, text:string) {
+    const message = (title != "") ? `[${title}] ${text}` : text
+    console.log(message)
+    this.logs.push("\t"+message.replaceAll(/\x1b\[\d\dm/g, ""))
   }
 
-  onlylog (arg:string) {
-    this.logs.push(arg.replaceAll(/\x1b\[\d\dm/g, ""))
+  onlylog (title:string, text:string) {
+    const message = (title != "") ? `[${title}] ${text}` : text
+    this.logs.push(message.replaceAll(/\x1b\[\d\dm/g, ""))
   }
 
   handleError(
