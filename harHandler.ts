@@ -84,6 +84,9 @@ export class HarHandler {
     , Promise.resolve())
 
     await new PathLike(this.output_dir, "log.txt").write_text(this.loggs.logs.join("\n"))
+    await new PathLike(this.output_dir, "MainFiles.json").write_text(
+      JSON.stringify({info: this.loggs.file_infos}, null, 2)
+    )
     console.log(" -------- Handling conmplete!! --------")
     console.log(`output files are in: ${green(this.output_dir.path)}\n`)
 
@@ -120,6 +123,7 @@ export class HarHandler {
           await file_p.write_bytes(base64Decode(text))
           this.loggs.onlylog("", `\t${mimeType}`)
           this.loggs.log(blue("creat"), `${file_p.name}`)
+          this.loggs.set_info(file_p, new URL(url).pathname)
         } catch (error) {
           this.loggs.log(red("ERROE (img)"), `${file_p.name}\n${error}\n`)
         }
@@ -192,6 +196,7 @@ export class HarHandler {
     await file_p.write_bytes(base64Decode(text))
     this.loggs.onlylog("", `\tmp3`)
     this.loggs.log(blue("create"), file_p.name)
+    this.loggs.set_info(file_p, new URL(url).pathname)
   }
 
   
@@ -210,6 +215,7 @@ export class HarHandler {
       await file_p.write_text(data)
       this.loggs.onlylog("", `\tplist`)
       this.loggs.log(blue("create"), file_p.name)
+      this.loggs.set_info(file_p, new URL(url).pathname)
     }
     else if (name.endsWith(".unity3d")){
       const file_p = new PathLike(this.#unity_dir, name)
@@ -230,12 +236,12 @@ export class HarHandler {
       else if (texted.startsWith("@UTF")){
         const file_p = new PathLike(this.#acbawb_dir, name + ".acb")
         await file_p.write_bytes(base64Decode(text))
-        await this.#Appry_vgmstresm(file_p.path, true)
+        await this.#Appry_vgmstresm(file_p.path, true, url)
       }
       else if (texted.slice(4,12) == "ftypisom"){
         const file_p = new PathLike(this.#sound_dir, name +  "_somemp4")
         await file_p.write_bytes(base64Decode(text))
-        await this.#Appry_vgmstresm(file_p.path, false)
+        await this.#Appry_vgmstresm(file_p.path, false, url)
       }
       else if (texted.startsWith("AFS2")){
         const file_p = new PathLike(this.#acbawb_dir, name + ".acb")
@@ -256,6 +262,7 @@ export class HarHandler {
   async #Appry_vgmstresm(
     file_path: string,
     is_acb: boolean,
+    url: string,
   ){
     const file_p = new PathLike(file_path)
     const command = new Deno.Command("C:\\Users\\kmnao\\OneDrive\\ドキュメント\\いろいろ\\vgmstream-win\\test.exe", {
@@ -273,9 +280,11 @@ export class HarHandler {
       if (act_name){
         this.loggs.onlylog("", `\twab`)
         this.loggs.log(blue("create"), `${act_name[1]}.wav`)
+        this.loggs.set_info(new PathLike(`${act_name[1]}.wav`), url)
       } else {
         this.loggs.onlylog("", `\twab`)
         this.loggs.log(blue("create"), `${file_p.stem}.wav`)
+        this.loggs.set_info(new PathLike(`${file_p.stem}.wav`), url)
       }
       await Deno.remove(file_path)
     } else {
@@ -290,10 +299,12 @@ export class HarHandler {
 class Logs {
   logs: Array<string>;
   failed: Array<{mimeType: string, comment:string, text:string, encoding:string|undefined, entry_index: number}>;
+  file_infos: Array<{type:string, name:string, url:string, from:string, to:string}>;
 
   constructor() {
     this.logs = []
     this.failed = []
+    this.file_infos = []
   }
 
   log (title:string, text:string) {
@@ -305,6 +316,12 @@ class Logs {
   onlylog (title:string, text:string) {
     const message = (title != "") ? `[${title}] ${text}` : text
     this.logs.push(message.replaceAll(/\x1b\[\d\dm/g, ""))
+  }
+
+  set_info (file_p:PathLike, url:string){
+    this.file_infos.push({
+      type: file_p.suffix.slice(1), name: file_p.name, url, from:"", to:""
+    })
   }
 
   handleError(
