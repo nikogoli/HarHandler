@@ -79,6 +79,11 @@ export class HarHandler {
         } else {
           this.loggs.log(yellow("skip"), `(mimeType: ${mimeType}): response.content.text NOT exist.`)
           this.loggs.onlylog("Skip", `\n`)
+          if (mimeType.includes("image") || mimeType.includes("mpeg")){
+            const pathname = new URL(url).pathname
+            const name = pathname.split("/").at(-1)!
+            this.loggs.set_info(new PathLike(name), url, true)
+          }
         }
       })
     , Promise.resolve())
@@ -318,9 +323,10 @@ class Logs {
     this.logs.push(message.replaceAll(/\x1b\[\d\dm/g, ""))
   }
 
-  set_info (file_p:PathLike, url:string){
+  set_info (file_p:PathLike, url:string, is_skipped?: true){
+    const from = is_skipped ? "SKIPPED" : ""
     this.file_infos.push({
-      type: file_p.suffix.slice(1), name: file_p.name, url, from:"", to:""
+      type: file_p.suffix.slice(1), name: file_p.name, url, from, to:""
     })
   }
 
