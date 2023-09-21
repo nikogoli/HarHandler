@@ -90,7 +90,7 @@ export class HarHandler {
 
     await new PathLike(this.output_dir, "log.txt").write_text(this.loggs.logs.join("\n"))
     await new PathLike(this.output_dir, "MainFiles.json").write_text(
-      JSON.stringify({info: this.loggs.file_infos}, null, 2)
+      JSON.stringify({list: this.loggs.file_infos}, null, 2)
     )
     console.log(" -------- Handling conmplete!! --------")
     console.log(`output files are in: ${green(this.output_dir.path)}\n`)
@@ -304,7 +304,7 @@ export class HarHandler {
 class Logs {
   logs: Array<string>;
   failed: Array<{mimeType: string, comment:string, text:string, encoding:string|undefined, entry_index: number}>;
-  file_infos: Array<{type:string, name:string, url:string, from:string, to:string}>;
+  file_infos: Array<{file_type:string, name:string, url:string, from:string, to:string}>;
 
   constructor() {
     this.logs = []
@@ -326,7 +326,7 @@ class Logs {
   set_info (file_p:PathLike, url:string, is_skipped?: true){
     const from = is_skipped ? "SKIPPED" : ""
     this.file_infos.push({
-      type: file_p.suffix.slice(1), name: file_p.name, url, from, to:""
+      file_type: file_p.suffix.slice(1), name: file_p.name, url, from, to:""
     })
   }
 
