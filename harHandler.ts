@@ -89,11 +89,13 @@ export class HarHandler {
     , Promise.resolve())
 
     await new PathLike(this.output_dir, "log.txt").write_text(this.loggs.logs.join("\n"))
-    await new PathLike(this.output_dir, "MainFiles.json").write_text(
+    const filelist_p = new PathLike(this.output_dir, "MainFiles.json")
+    await filelist_p.write_text(
       JSON.stringify({list: this.loggs.file_infos}, null, 2)
     )
     console.log(" -------- Handling conmplete!! --------")
-    console.log(`output files are in: ${green(this.output_dir.path)}\n`)
+    console.log(`output files are in: ${green(this.output_dir.path)}`)
+    console.log(`files list is: ${green(filelist_p.path)}\n`)
 
     if (this.loggs.failed.length > 0){
       console.log(`some fail are exist. Please check [${red("fail.json")}]\n`)
@@ -101,7 +103,7 @@ export class HarHandler {
           .write_JSON({failed:this.loggs.failed}, {space:2})
       return false 
     } else {
-      return true
+      return filelist_p.name
     }
   }
 
