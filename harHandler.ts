@@ -6,6 +6,9 @@ import { PathLike } from "https://pax.deno.dev/nikogoli/deno_pathlib@0.0.3"
 import { LogType } from "./types.ts"
 
 
+export const FILELIST_NAME = "MainFiles.json"
+
+
 export class HarHandler {
   output_dir: PathLike;
   #unity_dir: PathLike;
@@ -89,7 +92,7 @@ export class HarHandler {
     , Promise.resolve())
 
     await new PathLike(this.output_dir, "log.txt").write_text(this.loggs.logs.join("\n"))
-    const filelist_p = new PathLike(this.output_dir, "MainFiles.json")
+    const filelist_p = new PathLike(this.output_dir, FILELIST_NAME)
     await filelist_p.write_text(
       JSON.stringify({list: this.loggs.file_infos}, null, 2)
     )
