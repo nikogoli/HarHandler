@@ -153,3 +153,15 @@ type TimingsType = {
   ssl?: number,
   comment?: string,
 }
+
+
+export type FileInfo = {
+  file_type:string,
+  name:string,
+  url:string,
+  from:string,
+  to:string
+}
+
+
+export type FileList = { list: Array<FileInfo> }

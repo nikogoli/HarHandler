@@ -3,7 +3,7 @@ import { ensureDir } from "https://deno.land/std@0.177.0/fs/mod.ts"
 import { blue, green, red, yellow } from "https://deno.land/std@0.177.0/fmt/colors.ts"
 
 import { PathLike } from "https://pax.deno.dev/nikogoli/deno_pathlib@0.0.3"
-import { LogType } from "./types.ts"
+import { LogType, FileInfo, FileList } from "./types.ts"
 
 
 export const FILELIST_NAME = "MainFiles.json"
@@ -93,9 +93,8 @@ export class HarHandler {
 
     await new PathLike(this.output_dir, "log.txt").write_text(this.loggs.logs.join("\n"))
     const filelist_p = new PathLike(this.output_dir, FILELIST_NAME)
-    await filelist_p.write_text(
-      JSON.stringify({list: this.loggs.file_infos}, null, 2)
-    )
+    const filelist: FileList = {list: this.loggs.file_infos}
+    await filelist_p.write_JSON(filelist, {space:2})
     console.log(" -------- Handling conmplete!! --------")
     console.log(`output files are in: ${green(this.output_dir.path)}`)
     console.log(`files list is: ${green(filelist_p.path)}\n`)
@@ -309,7 +308,7 @@ export class HarHandler {
 class Logs {
   logs: Array<string>;
   failed: Array<{mimeType: string, comment:string, text:string, encoding:string|undefined, entry_index: number}>;
-  file_infos: Array<{file_type:string, name:string, url:string, from:string, to:string}>;
+  file_infos: Array<FileInfo>;
 
   constructor() {
     this.logs = []
