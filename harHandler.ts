@@ -72,6 +72,9 @@ export class HarHandler {
           else if (mimeType.split(";")[0].includes("octet-stream")){
             await this.#handle_XHR_bynaryOcted(url, text, encoding, idx)
           }
+          else if (mimeType.split(";")[0].includes("video/mp4")){
+            await this.#handle_XHR_moveiMpeg(url, text, idx)
+          }
           else {
             if (entry.response.content.comment && entry.response.content.comment == "応答ボディは省略しました。"){
               this.loggs.log("", `\t ${red("ブラウザによって省略")}：${url}`)
@@ -204,6 +207,22 @@ export class HarHandler {
       : new PathLike(this.#sound_dir, name)
     await file_p.write_bytes(base64Decode(text))
     this.loggs.onlylog("", `\tmp3`)
+    this.loggs.log(blue("create"), file_p.name)
+    this.loggs.set_info(file_p, new URL(url).pathname)
+  }
+
+
+  async #handle_XHR_moveiMpeg(
+    url: string,
+    text: string,
+    idx: number,
+  ) {
+    const name = url.split("/").at(-1)!
+    const file_p = (name == undefined || name.includes(".") == false)
+      ? new PathLike(this.#misc_dir, `${idx}.mp4`)
+      : new PathLike(this.#misc_dir, name)
+    await file_p.write_bytes(base64Decode(text))
+    this.loggs.onlylog("", `\tmp4`)
     this.loggs.log(blue("create"), file_p.name)
     this.loggs.set_info(file_p, new URL(url).pathname)
   }
