@@ -221,10 +221,16 @@ export class HarHandler {
     const file_p = (name == undefined || name.includes(".") == false)
       ? new PathLike(this.#misc_dir, `${idx}.mp4`)
       : new PathLike(this.#misc_dir, name)
-    await file_p.write_bytes(base64Decode(text))
-    this.loggs.onlylog("", `\tmp4`)
-    this.loggs.log(blue("create"), file_p.name)
-    this.loggs.set_info(file_p, new URL(url).pathname)
+    try {
+      await file_p.write_bytes(base64Decode(text))
+      this.loggs.onlylog("", `\tmp4`)
+      this.loggs.log(blue("create"), file_p.name)
+      this.loggs.set_info(file_p, new URL(url).pathname) 
+    } catch (error) {
+      this.loggs.onlylog("", `\tmp4`)
+      this.loggs.log(red("error"), file_p.name)
+      console.log(error)
+    }
   }
 
   
