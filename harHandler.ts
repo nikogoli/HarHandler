@@ -2,7 +2,7 @@ import { decode as base64Decode } from "https://deno.land/std@0.177.0/encoding/b
 import { ensureDir } from "https://deno.land/std@0.177.0/fs/mod.ts"
 import { blue, green, red, yellow } from "https://deno.land/std@0.177.0/fmt/colors.ts"
 
-import { PathLike } from "https://pax.deno.dev/nikogoli/deno_pathlib@0.0.3"
+import { PathLike } from "https://raw.githubusercontent.com/nikogoli/deno_pathlib/0.0.4/mod.ts"
 import { LogType, FileInfo, FileList } from "./types.ts"
 
 
