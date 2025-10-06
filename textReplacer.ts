@@ -1,5 +1,5 @@
-import { PathLike } from "https://pax.deno.dev/nikogoli/deno_pathlib@0.0.3"
-import { red, blue } from "https://deno.land/std@0.177.0/fmt/colors.ts"
+import { PathLike } from "deno_pathlib"
+import { red, blue } from "@std/fmt/color"
 
 await runner()
 

@@ -1,6 +1,6 @@
 import { HarHandler } from "./harHandler.ts"
-import { PathLike } from "https://raw.githubusercontent.com/nikogoli/deno_pathlib/dev/mod.ts"
-import { red } from "https://deno.land/std@0.177.0/fmt/colors.ts"
+import { PathLike } from "deno_pathlib"
+import { red } from "@std/fmt/color"
 
 await runner()
 
